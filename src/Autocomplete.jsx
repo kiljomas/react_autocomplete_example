@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from "react";
 import PropTypes from "prop-types";
+import { getProfile, updateProfile } from "./profile";
 
 class Autocomplete extends Component {
   static propTypes = {
@@ -18,6 +19,8 @@ class Autocomplete extends Component {
       activeSuggestion: 0,
       // The suggestions that match the user's input
       filteredSuggestions: [],
+      // recently selected
+      recentSelections: [],
       // Whether or not the suggestion list is shown
       showSuggestions: false,
       // What the user has entered
@@ -25,13 +28,21 @@ class Autocomplete extends Component {
     };
   }
 
-  onChange = e => {
+  componentDidMount() {
+    getProfile(true).then((profile) => {
+      this.setState({
+        recentSelections: profile.recentSelections
+      });
+    });
+  }
+
+  onChange = (e) => {
     const { suggestions } = this.props;
     const userInput = e.currentTarget.value;
 
     // Filter our suggestions that don't contain the user's input
     const filteredSuggestions = suggestions.filter(
-      suggestion =>
+      (suggestion) =>
         suggestion.toLowerCase().indexOf(userInput.toLowerCase()) > -1
     );
 
@@ -43,16 +54,24 @@ class Autocomplete extends Component {
     });
   };
 
-  onClick = e => {
+  onClick = (e) => {
+    // update recent selections with new selection (bug here!)
+    const recentSelections = [
+      e.currentTarget.innerText,
+      ...this.state.recentSelections
+    ].slice(0, 3);
+    updateProfile({ recentSelections });
+
     this.setState({
       activeSuggestion: 0,
       filteredSuggestions: [],
       showSuggestions: false,
-      userInput: e.currentTarget.innerText
+      userInput: e.currentTarget.innerText,
+      recentSelections
     });
   };
 
-  onKeyDown = e => {
+  onKeyDown = (e) => {
     const { activeSuggestion, filteredSuggestions } = this.state;
 
     // User pressed the enter key
@@ -89,6 +108,7 @@ class Autocomplete extends Component {
       state: {
         activeSuggestion,
         filteredSuggestions,
+        recentSelections,
         showSuggestions,
         userInput
       }
@@ -96,24 +116,67 @@ class Autocomplete extends Component {
 
     let suggestionsListComponent;
 
+    let recentSuggestions = filteredSuggestions.filter(
+      (s) => recentSelections.indexOf(s) >= 0
+    );
+    let otherSuggestions = filteredSuggestions.filter(
+      (s) => recentSelections.indexOf(s) === -1
+    );
+
     if (showSuggestions && userInput) {
       if (filteredSuggestions.length) {
         suggestionsListComponent = (
-          <ul class="suggestions">
-            {filteredSuggestions.map((suggestion, index) => {
-              let className;
+          <ul class="suggestionsheading">
+            {recentSuggestions.length > 0 ? (
+              <li>
+                Recent
+                <ul class="suggestions">
+                  {recentSuggestions.map((suggestion) => {
+                    let className;
 
-              // Flag the active suggestion with a class
-              if (index === activeSuggestion) {
-                className = "suggestion-active";
-              }
+                    // Flag the active suggestion with a class
+                    const index = filteredSuggestions.indexOf(suggestion);
+                    if (index === activeSuggestion) {
+                      className = "suggestion-active";
+                    }
 
-              return (
-                <li className={className} key={suggestion} onClick={onClick}>
-                  {suggestion}
-                </li>
-              );
-            })}
+                    return (
+                      <li
+                        className={className}
+                        key={suggestion}
+                        onClick={onClick}
+                      >
+                        {suggestion}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </li>
+            ) : null}
+            <li>
+              Animals
+              <ul class="suggestions">
+                {otherSuggestions.map((suggestion) => {
+                  let className;
+
+                  // Flag the active suggestion with a class
+                  const index = filteredSuggestions.indexOf(suggestion);
+                  if (index === activeSuggestion) {
+                    className = "suggestion-active";
+                  }
+
+                  return (
+                    <li
+                      className={className}
+                      key={suggestion}
+                      onClick={onClick}
+                    >
+                      {suggestion}
+                    </li>
+                  );
+                })}
+              </ul>
+            </li>
           </ul>
         );
       } else {

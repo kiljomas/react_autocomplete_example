@@ -13,15 +13,27 @@ input {
   padding: 0.5rem;
 }
 
-.suggestions {
+.suggestionsheading {
   border: 1px solid #999;
-  border-top-width: 0;
   list-style: none;
   margin-top: 0;
-  max-height: 143px;
+  max-height: 170px;
   overflow-y: auto;
   padding-left: 0;
   width: calc(300px + 1rem);
+  font-weight: 700;
+  padding: 0.5rem;
+}
+
+.suggestions {
+  border: 1px solid #999;
+  list-style: none;
+  margin-top: 0;
+  max-height: 170px;
+  overflow-y: auto;
+  padding-left: 0;
+  width: calc(300px + 1rem);
+  font-weight: 200;
 }
 
 .suggestions li {
