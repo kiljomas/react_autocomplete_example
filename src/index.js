@@ -8,20 +8,18 @@ require("./styles.css");
 function App() {
   return (
     <div>
-      <h1>React Autocomplete Demo</h1>
+      <h1>React Animal Autocomplete Example</h1>
       <h2>Start typing and experience the autocomplete wizardry!</h2>
+      <p>New! Autocomplete now suggests recently selected animals first.</p>
       <Autocomplete
         suggestions={[
           "Alligator",
-          "Bask",
-          "Crocodilian",
-          "Death Roll",
-          "Eggs",
-          "Jaws",
-          "Reptile",
-          "Solitary",
-          "Tail",
-          "Wetlands"
+          "Little Brown Bat",
+          "Dog",
+          "Bald Eagle",
+          "Lion",
+          "Red Panda",
+          "Wyoming Toad"
         ]}
       />
     </div>
